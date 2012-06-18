@@ -1,0 +1,19 @@
+<package>
+  <description brief="orogen integration of the Schilling Actuator from drivers/act_schilling">
+  orogen integration of Schilling Actuator
+  </description>
+  <author>Sitta Buhmann/sbuhmann@marum.de</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <!--
+   To add any dependencies use the depend tag
+  <depend package="dummy-dependency-0" />
+	...
+  <depend package="dummy-dependency-n-1" />
+  <depend package="dummy-dependency-n" />
+  -->
+  <depend package="drivers/orogen/iodrivers_base" />
+  <depend package="drivers/orogen/aggregator" />
+  <depend package="drivers/act_schilling" />
+</package>

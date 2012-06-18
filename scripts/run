@@ -1,0 +1,54 @@
+#! /usr/bin/env ruby
+#
+require 'orocos'
+require 'optparse'
+Orocos.initialize
+
+gui = false
+optparse = OptionParser.new do |opt|
+    opt.banner = "run [--gui] DEVICE"
+    opt.on '--gui', "starts the Rock task inspection widget on the running task" do
+        gui = true
+    end
+end
+io_port = *optparse.parse(ARGV)
+if !io_port
+    puts optparse
+    exit 1
+end
+
+if gui
+    require 'vizkit'
+end
+
+Orocos.run 'act_schilling::Task' => 'act' do
+    
+    Orocos.logger.level = Logger::DEBUG
+    Orocos.log_all
+    puts "deployed the act_schilling::Task task"
+
+    act = Orocos::TaskContext.get 'act'
+    act.io_port = io_port
+    act.io_read_timeout = Time.at(2);
+    act.config do |p|
+        p.trapVel = 10000;
+	p.velMode = false;
+    end
+    act.configure
+    act.start
+
+    if gui
+        task_inspector = Vizkit.default_loader.task_inspector
+        task_inspector.config(act)
+        task_inspector.show
+        Vizkit.exec
+    else
+        reader = act.act_samples.reader
+        Orocos.watch(act) do
+            if sample = reader.read
+                pp sample
+            end
+        end
+    end
+end
+
