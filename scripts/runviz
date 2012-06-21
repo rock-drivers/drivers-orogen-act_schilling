@@ -33,7 +33,7 @@ Orocos.run 'act_schilling_test' do
     act.io_read_timeout = Time.at(2);
     act.config do |p|
         p.velocity = 10000;
-	p.velMode = false;
+	p.ctrlMode = 'MODE_POS';
 	p.homePos = 45;
     end
     act.configure
