@@ -1,0 +1,93 @@
+#! /usr/bin/env ruby
+#
+require 'orocos'
+require 'vizkit'
+require 'optparse'
+Orocos.initialize
+
+gui = false
+optparse = OptionParser.new do |opt|
+    opt.banner = "run [--gui] DEVICE"
+    opt.on '--gui', "starts the Rock task inspection widget on the running task" do
+        gui = true
+    end
+end
+io_port = *optparse.parse(ARGV)
+if !io_port
+    puts optparse
+    exit 1
+end
+
+if gui
+    require 'vizkit'
+end
+
+Orocos.run 'act_schilling_test' do
+    
+    Orocos.logger.level = Logger::DEBUG
+    Orocos.log_all
+    puts "deployed the act_schilling::Task task"
+
+    act = Orocos::TaskContext.get 'act_schilling'
+    act.io_port = io_port
+    act.io_read_timeout = Time.at(2);
+    act.config do |p|
+        p.velocity = 10000;
+	p.velMode = false;
+	p.homePos = 45;
+    end
+    act.configure
+    act.start
+
+    if gui
+        task_inspector = Vizkit.default_loader.task_inspector
+        task_inspector.config(act)
+	task_inspector.show
+	guiviz = Vizkit.load 'scripts/act.ui'
+	
+	#act.pos.connect_to do |pos,_|
+         #   act.pos guiviz.slPos.value 
+            #data    
+        #end
+	
+	writer = act.pos.writer
+	  guiviz.slPos.connect(SIGNAL('valueChanged(int)')) do 
+	  sample = writer.new_sample
+	  sample = guiviz.slPos.value
+	  writer.write sample
+	end
+
+	writer1 = act.vel.writer
+	  guiviz.slVel.connect(SIGNAL('valueChanged(int)')) do 
+	  sample = writer1.new_sample
+	  sample = guiviz.slVel.value
+	  writer1.write sample
+	end
+	
+	act.act_samples.connect_to do |data,_|
+           guiviz.edPos.setText data.shaftAng.to_s
+        end
+	
+	act.act_samples.connect_to do |data,_|
+           guiviz.edVel.setText data.shaftVel.to_s
+        end
+
+	#guiviz.slPos(SIGNAL('sliderReleased()'),self,
+         #                       :change_position)
+	
+	guiviz.pbCalibrate.connect(SIGNAL('clicked()')) do 
+            act.calibrate();
+        end
+	guiviz.show
+        Vizkit.exec
+    else
+        act.calibrate
+	reader = act.act_samples.reader
+        Orocos.watch(act) do
+            if sample = reader.read
+                #pp sample
+            end
+        end
+    end
+end
+

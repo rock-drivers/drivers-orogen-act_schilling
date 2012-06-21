@@ -105,6 +105,8 @@ namespace act_schilling {
          * before calling start() again.
          */
          void cleanupHook();
+	 
+	 void calibrate();
     };
 }
 

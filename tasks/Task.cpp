@@ -70,13 +70,36 @@ bool Task::startHook()
  void Task::updateHook()
  {
     try{
-      LOG_DEBUG("updateHook, state: %i",state());
+      //LOG_DEBUG("updateHook, state: %i",state());
+      int val;
+      if (_pos.read(val) == RTT::NewData) {
+	LOG_DEBUG("input port pos changed");
+        mDriver->setAnglePos(val);
+      }
+      if (_vel.read(val) == RTT::NewData) {
+	LOG_DEBUG("input port pos changed");
+        mDriver->setVelocity(val);
+      }
       switch(state()){
 	case RUNNING: {
 	  mDriver->initDevice();
-	  state(RUN_DEV);
+	  state(INIT_DEV);
+	  break;
 	}
-      }
+	case INIT_DEV:{
+	  if(mDriver->getState().initialized){
+	    //mDriver->calibrate();
+	    state(CAL_DEV);
+	  }
+	  break;
+	}
+	case CAL_DEV:{
+	  if(mDriver->getState().calibrated){
+	    state(RUN_DEV);
+	  }
+	}
+	default: break;
+      }      
       if(mDriver->isIdle()){
 	mDriver->requestStatus();
       }
@@ -107,4 +130,10 @@ void Task::cleanupHook()
       mDriver->close();
     }
     TaskBase::cleanupHook();
+}
+
+void Task::calibrate()
+{
+  LOG_DEBUG("calibrate");
+  mDriver->calibrate();
 }

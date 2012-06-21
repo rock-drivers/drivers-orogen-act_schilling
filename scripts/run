@@ -33,6 +33,7 @@ Orocos.run 'act_schilling::Task' => 'act' do
     act.config do |p|
         p.trapVel = 10000;
 	p.velMode = false;
+	p.homePos = 45;
     end
     act.configure
     act.start
@@ -43,10 +44,11 @@ Orocos.run 'act_schilling::Task' => 'act' do
         task_inspector.show
         Vizkit.exec
     else
-        reader = act.act_samples.reader
+        act.calibrate
+	reader = act.act_samples.reader
         Orocos.watch(act) do
             if sample = reader.read
-                pp sample
+                #pp sample
             end
         end
     end

@@ -19,8 +19,14 @@ task_context "Task" do
     needs_configuration
     runtime_states  :INIT_DEV, :CAL_DEV, :RUN_DEV
     error_states :COMM_ERROR
-    property "config", "act_schilling/Config"    
+    property "config", "act_schilling/Config"  
+    operation('calibrate').
+        doc('calibrate device')
     output_port "act_samples", "act_schilling/ActData"
+    input_port('pos', 'int').
+        doc "set position"
+    input_port('vel', 'int').
+        doc "set velocity"
     periodic(0.2)
 end
 
@@ -31,6 +37,7 @@ deployment "act_schilling_test" do
     do_not_install
 
     # Declares it as periodic, with a period of 100ms
-    task("act_schilling", "act_schilling::Task")
+    task("act_schilling", "act_schilling::Task").
+      periodic(0.1)
     add_default_logger
 end
