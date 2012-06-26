@@ -19,11 +19,18 @@ task_context "Task" do
     needs_configuration
     runtime_states  :INIT_DEV, :CAL_DEV, :RUN_DEV
     error_states :COMM_ERROR
-    property "config", "act_schilling/Config"  
+    property('config','act_schilling/Config').
+	doc('configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles')
+    property('boundaries','act_schilling/ActBoundaries').
+	doc('boundaries are the min/max values in angle, determined by the actuators mechanical assembly')
     operation('calibrate').
         doc('calibrate device')
+    operation('setControlMode').
+        doc('set Control Mode').
+        argument('mode', 'act_schilling/ControlMode')
     output_port "act_samples", "act_schilling/ActData"
-    input_port('pos', 'int').
+    output_port "act_status", "act_schilling/ActDeviceStatus"
+    input_port('pos', 'double').
         doc "set position"
     input_port('vel', 'int').
         doc "set velocity"

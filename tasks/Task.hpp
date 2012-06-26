@@ -107,6 +107,10 @@ namespace act_schilling {
          void cleanupHook();
 	 
 	 void calibrate();
+	 
+	 void setControlMode(act_schilling::ControlMode const & mode);
+	 
+	 void processIO();
     };
 }
 

@@ -1,0 +1,43 @@
+--- name:pan1
+# boundaries are the min/max values in angle, determined by the actuators mechanical assembly
+boundaries: 
+  min: -359.991219512195
+  max: 359.991219512195
+# configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles
+config: 
+  ctrlMode: MODE_VEL
+  homePos: 45
+  velocity: 10000
+# no documentation available for this property
+io_port: tcp://10.112.102.20:4001
+# the timeout on read. Defaults to one second
+io_read_timeout: 
+  microseconds: 2000000
+# the interval at which the status port should be written. Defaults to one second
+io_status_interval: 
+  microseconds: 1000000
+# the timeout on write. Defaults to one second. Used only in direct I/O mode
+io_write_timeout: 
+  microseconds: 1000000
+
+--- name:pan2
+# boundaries are the min/max values in angle, determined by the actuators mechanical assembly
+boundaries: 
+  min: -359.991219512195
+  max: 359.991219512195
+# configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles
+config: 
+  ctrlMode: MODE_POS
+  homePos: 90
+  velocity: 20000
+# no documentation available for this property
+io_port: tcp://10.112.102.20:4001
+# the timeout on read. Defaults to one second
+io_read_timeout: 
+  microseconds: 2000000
+# the interval at which the status port should be written. Defaults to one second
+io_status_interval: 
+  microseconds: 1000000
+# the timeout on write. Defaults to one second. Used only in direct I/O mode
+io_write_timeout: 
+  microseconds: 1000000

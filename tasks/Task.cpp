@@ -70,16 +70,6 @@ bool Task::startHook()
  void Task::updateHook()
  {
     try{
-      //LOG_DEBUG("updateHook, state: %i",state());
-      int val;
-      if (_pos.read(val) == RTT::NewData) {
-	LOG_DEBUG("input port pos changed");
-        mDriver->setAnglePos(val);
-      }
-      if (_vel.read(val) == RTT::NewData) {
-	LOG_DEBUG("input port pos changed");
-        mDriver->setVelocity(val);
-      }
       switch(state()){
 	case RUNNING: {
 	  mDriver->initDevice();
@@ -88,23 +78,38 @@ bool Task::startHook()
 	}
 	case INIT_DEV:{
 	  if(mDriver->getState().initialized){
-	    //mDriver->calibrate();
 	    state(CAL_DEV);
 	  }
 	  break;
 	}
 	case CAL_DEV:{
 	  if(mDriver->getState().calibrated){
+	    _boundaries.set(mDriver->getBoundaries());
 	    state(RUN_DEV);
+	  }	  
+	  break;
+	}
+	case RUN_DEV:{
+	  double pos;
+	  if (_pos.read(pos) == RTT::NewData) {
+	    LOG_DEBUG("input port pos changed");
+	    mDriver->setAnglePos(pos);
 	  }
+	  int vel;
+	  if (_vel.read(vel) == RTT::NewData) {
+	    LOG_DEBUG("input port vel changed");
+	    mDriver->setVelocity(vel);
+	  }
+	  break;
 	}
 	default: break;
-      }      
-      if(mDriver->isIdle()){
-	mDriver->requestStatus();
-      }
+      }   
+      mDriver->requestStatus();
       mDriver->writeNext();
-      _act_samples.write(mDriver->getData());
+      while(!mDriver->isIdle()){
+	processIO();
+	mDriver->writeNext();
+      }
       TaskBase::updateHook();
     } catch(std::runtime_error &e){
       LOG_DEBUG("exception %s",e.what());
@@ -116,6 +121,7 @@ bool Task::startHook()
  {
    LOG_DEBUG("errorHook");
    TaskBase::errorHook();
+   mDriver->setResetState();
    recover();
  }
 
@@ -134,6 +140,23 @@ void Task::cleanupHook()
 
 void Task::calibrate()
 {
-  LOG_DEBUG("calibrate");
   mDriver->calibrate();
+}
+
+void Task::setControlMode(act_schilling::ControlMode  const & mode)
+{
+  mDriver->setControlMode(mode);
+}
+
+void Task::processIO()
+{
+  try{
+    mDriver->read();
+    if(mDriver->hasStatusUpdate()){
+       _act_samples.write(mDriver->getData());
+       _act_status.write(mDriver->getDeviceStatus());
+    }
+  }catch(std::runtime_error& e){
+    error(COMM_ERROR);
+  }
 }

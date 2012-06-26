@@ -12,8 +12,8 @@ optparse = OptionParser.new do |opt|
         gui = true
     end
 end
-io_port = *optparse.parse(ARGV)
-if !io_port
+dev_id = *optparse.parse(ARGV)
+if !dev_id
     puts optparse
     exit 1
 end
@@ -29,13 +29,9 @@ Orocos.run 'act_schilling_test' do
     puts "deployed the act_schilling::Task task"
 
     act = Orocos::TaskContext.get 'act_schilling'
-    act.io_port = io_port
     act.io_read_timeout = Time.at(2);
-    act.config do |p|
-        p.velocity = 10000;
-	p.ctrlMode = 'MODE_POS';
-	p.homePos = 45;
-    end
+    #act.apply_conf_file("act.yml")
+    Orocos.apply_conf_file(act, 'act.yml', [dev_id])
     act.configure
     act.start
 
@@ -44,11 +40,6 @@ Orocos.run 'act_schilling_test' do
         task_inspector.config(act)
 	task_inspector.show
 	guiviz = Vizkit.load 'scripts/act.ui'
-	
-	#act.pos.connect_to do |pos,_|
-         #   act.pos guiviz.slPos.value 
-            #data    
-        #end
 	
 	writer = act.pos.writer
 	  guiviz.slPos.connect(SIGNAL('valueChanged(int)')) do 
@@ -72,12 +63,28 @@ Orocos.run 'act_schilling_test' do
            guiviz.edVel.setText data.shaftVel.to_s
         end
 
-	#guiviz.slPos(SIGNAL('sliderReleased()'),self,
-         #                       :change_position)
-	
 	guiviz.pbCalibrate.connect(SIGNAL('clicked()')) do 
             act.calibrate();
         end
+	guiviz.pbStop.connect(SIGNAL('clicked()')) do 
+            guiviz.slVel.value = 0;
+        end
+	guiviz.rbPos.connect(SIGNAL('clicked()')) do 
+	    act.setControlMode('MODE_POS');
+	    #act.config do |p|
+	     # p.ctrlMode = 'MODE_POS';
+	    #end
+            #act.config.ctrlMode = 'MODE_POS'
+        end
+	
+	guiviz.rbVel.connect(SIGNAL('clicked()')) do 
+            act.setControlMode('MODE_VEL');
+        end
+	
+	guiviz.rbNone.connect(SIGNAL('clicked()')) do 
+            act.setControlMode('MODE_NONE');
+        end
+	
 	guiviz.show
         Vizkit.exec
     else
