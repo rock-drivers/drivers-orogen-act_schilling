@@ -1,9 +1,11 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 #include <base/logging.h>
 #include <act_schilling/Driver.hpp>
+#include <act_schilling/Error.hpp>
 #include "Task.hpp"
 
 using namespace act_schilling;
+using namespace oro_marum;
 
 Task::Task(std::string const& name)
     : TaskBase(name),
@@ -153,10 +155,54 @@ void Task::processIO()
   try{
     mDriver->read();
     if(mDriver->hasStatusUpdate()){
-       _act_samples.write(mDriver->getData());
-       _act_status.write(mDriver->getDeviceStatus());
+       ActData data = mDriver->getData();
+       _act_samples.write(data);
+       ActDeviceStatus devStatus = mDriver->getDeviceStatus(); 
+       _act_status.write(devStatus);
+       statusCheck(devStatus);
     }
   }catch(std::runtime_error& e){
+    _log_message.write(LogMessage(e));
     error(COMM_ERROR);
+  }
+}
+
+void Task::statusCheck(const ActDeviceStatus& devStatus)
+{
+  if(devStatus.ctrlStatus & ACT_CTRL_WD_TIME){
+    _log_message.write(LogMessage(Alarm, ACTSTR_ENC_LIN_ALARM, ACTALARM_CTRL_WD_TIME));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_MAG){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_MAG,ACTALARM_CTRL_EXT_ENC_MAG));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_COMM){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_COMM,ACTALARM_CTRL_EXT_ENC_COMM));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_MAG){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_MAG,ACTALARM_CTRL_SH_ENC_MAG));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_WATER){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_WATER,ACTALARM_CTRL_WATER));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_COMM){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_COMM,ACTALARM_CTRL_SH_ENC_COMM));
+  }
+  if(devStatus.driveStatus & ACT_DRV_CMD_INC){
+    _log_message.write(LogMessage(Error, ACTSTR_DRV_CMD_INC,ACTALARM_DRV_CMD_INC));
+  }
+  if(devStatus.driveStatus & ACT_DRV_CMD_INV){
+    _log_message.write(LogMessage(Error, ACTSTR_DRV_CMD_INV,ACTALARM_DRV_CMD_INV));
+  }
+  if(devStatus.driveStatus & ACT_DRV_FRAME_ERR){
+    _log_message.write(LogMessage(Error, ACTSTR_DRV_FRAME_ERR,ACTALARM_DRV_FRAME_ERR));
+  }
+  if(devStatus.driveStatus & ACT_DRV_VOLT_TEMP){
+    _log_message.write(LogMessage(Alarm, ACTSTR_DRV_VOLT_TEMP,ACTALARM_DRV_VOLT_TEMP));
+  }
+  if(devStatus.encoderStatus & ACT_ENC_LIN_ALARM){
+    _log_message.write(LogMessage(Alarm, ACTSTR_ENC_LIN_ALARM,ACTALARM_ENC_LIN_ALARM));
+  }
+  if(devStatus.encoderStatus & ACT_ENC_RANGE_ERR){
+    _log_message.write(LogMessage(Alarm, ACTSTR_ENC_RANGE_ERR,ACTALARM_ENC_RANGE_ERR));
   }
 }

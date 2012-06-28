@@ -110,7 +110,10 @@ namespace act_schilling {
 	 
 	 void setControlMode(act_schilling::ControlMode const & mode);
 	 
+    private:
 	 void processIO();
+	 
+	 void statusCheck(const ActDeviceStatus& devStatus);
     };
 }
 

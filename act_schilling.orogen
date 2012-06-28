@@ -7,6 +7,7 @@ using_library "aggregator"
 import_types_from 'aggregator'
 import_types_from "act_schilling/ActTypes.hpp"
 import_types_from "act_schilling/Config.hpp"
+import_types_from "act_schilling/Error.hpp"
 
 using_task_library "iodrivers_base"
 
@@ -24,12 +25,14 @@ task_context "Task" do
     property('boundaries','act_schilling/ActBoundaries').
 	doc('boundaries are the min/max values in angle, determined by the actuators mechanical assembly')
     operation('calibrate').
-        doc('calibrate device')
+        doc('start calibration of the device')
     operation('setControlMode').
-        doc('set Control Mode').
+        doc('set the control mode to position, velocity or none').
         argument('mode', 'act_schilling/ControlMode')
     output_port "act_samples", "act_schilling/ActData"
     output_port "act_status", "act_schilling/ActDeviceStatus"
+    output_port('log_message', 'oro_marum/LogMessage').
+        doc 'TextMessage with different priority levels'
     input_port('pos', 'double').
         doc "set position"
     input_port('vel', 'int').
