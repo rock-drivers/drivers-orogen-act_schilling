@@ -4,6 +4,7 @@
 #include <act_schilling/Error.hpp>
 #include "Task.hpp"
 
+
 using namespace act_schilling;
 using namespace oro_marum;
 
@@ -172,12 +173,6 @@ void Task::statusCheck(const ActDeviceStatus& devStatus)
   if(devStatus.ctrlStatus & ACT_CTRL_WD_TIME){
     _log_message.write(LogMessage(Alarm, ACTSTR_ENC_LIN_ALARM, ACTALARM_CTRL_WD_TIME));
   }
-  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_MAG){
-    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_MAG,ACTALARM_CTRL_EXT_ENC_MAG));
-  }
-  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_COMM){
-    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_COMM,ACTALARM_CTRL_EXT_ENC_COMM));
-  }
   if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_MAG){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_MAG,ACTALARM_CTRL_SH_ENC_MAG));
   }
@@ -205,4 +200,12 @@ void Task::statusCheck(const ActDeviceStatus& devStatus)
   if(devStatus.encoderStatus & ACT_ENC_RANGE_ERR){
     _log_message.write(LogMessage(Alarm, ACTSTR_ENC_RANGE_ERR,ACTALARM_ENC_RANGE_ERR));
   }
+#ifdef ACT_EXT_ENC
+  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_MAG){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_MAG,ACTALARM_CTRL_EXT_ENC_MAG));
+  }
+  if(devStatus.ctrlStatus & ACT_CTRL_EXT_ENC_COMM){
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_EXT_ENC_COMM,ACTALARM_CTRL_EXT_ENC_COMM));
+  }
+#endif
 }
