@@ -30,7 +30,6 @@ Orocos.run 'act_schilling_test' do
 
     act = Orocos::TaskContext.get 'act_schilling'
     act.io_read_timeout = Time.at(2);
-    #act.apply_conf_file("act.yml")
     Orocos.apply_conf_file(act, 'act.yml', [dev_id])
     act.configure
     act.start

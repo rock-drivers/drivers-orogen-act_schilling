@@ -7,7 +7,7 @@ boundaries:
 config: 
   ctrlMode: MODE_VEL
   homePos: 45
-  velocity: 10000
+  velocity: 1250
 # no documentation available for this property
 io_port: tcp://10.112.102.20:4001
 # the timeout on read. Defaults to one second
