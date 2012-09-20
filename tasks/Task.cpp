@@ -1,7 +1,7 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 #include <base/logging.h>
 #include <act_schilling/Driver.hpp>
-#include <act_schilling/Error.hpp>
+#include <base_schilling/Error.hpp>
 #include "Task.hpp"
 
 

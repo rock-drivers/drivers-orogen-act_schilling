@@ -7,7 +7,7 @@ using_library "aggregator"
 import_types_from 'aggregator'
 import_types_from "act_schilling/ActTypes.hpp"
 import_types_from "act_schilling/Config.hpp"
-import_types_from "act_schilling/Error.hpp"
+import_types_from "base_schilling/Error.hpp"
 
 using_task_library "iodrivers_base"
 
