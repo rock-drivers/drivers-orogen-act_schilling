@@ -171,7 +171,7 @@ void Task::processIO()
 void Task::statusCheck(const ActDeviceStatus& devStatus)
 {
   if(devStatus.ctrlStatus & ACT_CTRL_WD_TIME){
-    _log_message.write(LogMessage(Alarm, ACTSTR_ENC_LIN_ALARM, ACTALARM_CTRL_WD_TIME));
+    _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_WD_TIME, ACTALARM_CTRL_WD_TIME));
   }
   if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_MAG){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_MAG,ACTALARM_CTRL_SH_ENC_MAG));
