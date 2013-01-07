@@ -5,8 +5,8 @@ boundaries:
   max: 359.991219512195
 # configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles
 config: 
-  ctrlMode: MODE_VEL
-  homePos: 45
+  ctrl_mode: MODE_VEL
+  home_pos: 45
   velocity: 1250
 # no documentation available for this property
 io_port: tcp://10.112.102.20:4001
@@ -27,8 +27,8 @@ boundaries:
   max: 359.991219512195
 # configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles
 config: 
-  ctrlMode: MODE_POS
-  homePos: 90
+  ctrl_mode: MODE_POS
+  home_pos: 90
   velocity: 20000
 # no documentation available for this property
 io_port: tcp://10.112.102.20:4001

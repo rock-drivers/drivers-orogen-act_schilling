@@ -31,8 +31,8 @@ Orocos.run 'act_schilling::Task' => 'act' do
     act.io_port = io_port
     act.io_read_timeout = Time.at(2);
     act.config do |p|
-        p.trapVel = 10000;
-	p.velMode = false;
+        p.velocity = 1250;
+	p.ctrl_mode = 'MODE_VEL';
 	p.homePos = 45;
     end
     act.configure

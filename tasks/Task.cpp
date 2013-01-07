@@ -4,6 +4,7 @@
 #include <base_schilling/Error.hpp>
 #include "Task.hpp"
 
+#define MAX_VEL 2000
 
 using namespace act_schilling;
 using namespace oro_marum;
@@ -93,10 +94,13 @@ bool Task::startHook()
 	  break;
 	}
 	case RUN_DEV:{
-	  double pos;
-	  if (_pos.read(pos) == RTT::NewData) {
+	  double d;
+	  if (_pos.read(d) == RTT::NewData) {
 	    LOG_DEBUG("input port pos changed");
-	    mDriver->setAnglePos(pos);
+	    mDriver->setAnglePos(d);
+	  }
+	  if (_doublevel.read(d) == RTT::NewData) {
+	    mDriver->setVelocity(d*MAX_VEL);
 	  }
 	  int vel;
 	  if (_vel.read(vel) == RTT::NewData) {
@@ -170,34 +174,34 @@ void Task::processIO()
 
 void Task::statusCheck(const ActDeviceStatus& devStatus)
 {
-  if(devStatus.ctrlStatus & ACT_CTRL_WD_TIME){
+  if(devStatus.ctrl_status & ACT_CTRL_WD_TIME){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_WD_TIME, ACTALARM_CTRL_WD_TIME));
   }
-  if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_MAG){
+  if(devStatus.ctrl_status & ACT_CTRL_SH_ENC_MAG){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_MAG,ACTALARM_CTRL_SH_ENC_MAG));
   }
-  if(devStatus.ctrlStatus & ACT_CTRL_WATER){
+  if(devStatus.ctrl_status & ACT_CTRL_WATER){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_WATER,ACTALARM_CTRL_WATER));
   }
-  if(devStatus.ctrlStatus & ACT_CTRL_SH_ENC_COMM){
+  if(devStatus.ctrl_status & ACT_CTRL_SH_ENC_COMM){
     _log_message.write(LogMessage(Alarm, ACTSTR_CTRL_SH_ENC_COMM,ACTALARM_CTRL_SH_ENC_COMM));
   }
-  if(devStatus.driveStatus & ACT_DRV_CMD_INC){
+  if(devStatus.drive_status & ACT_DRV_CMD_INC){
     _log_message.write(LogMessage(Error, ACTSTR_DRV_CMD_INC,ACTALARM_DRV_CMD_INC));
   }
-  if(devStatus.driveStatus & ACT_DRV_CMD_INV){
+  if(devStatus.drive_status & ACT_DRV_CMD_INV){
     _log_message.write(LogMessage(Error, ACTSTR_DRV_CMD_INV,ACTALARM_DRV_CMD_INV));
   }
-  if(devStatus.driveStatus & ACT_DRV_FRAME_ERR){
+  if(devStatus.drive_status & ACT_DRV_FRAME_ERR){
     _log_message.write(LogMessage(Error, ACTSTR_DRV_FRAME_ERR,ACTALARM_DRV_FRAME_ERR));
   }
-  if(devStatus.driveStatus & ACT_DRV_VOLT_TEMP){
+  if(devStatus.drive_status & ACT_DRV_VOLT_TEMP){
     _log_message.write(LogMessage(Alarm, ACTSTR_DRV_VOLT_TEMP,ACTALARM_DRV_VOLT_TEMP));
   }
-  if(devStatus.encoderStatus & ACT_ENC_LIN_ALARM){
+  if(devStatus.encoder_status & ACT_ENC_LIN_ALARM){
     _log_message.write(LogMessage(Alarm, ACTSTR_ENC_LIN_ALARM,ACTALARM_ENC_LIN_ALARM));
   }
-  if(devStatus.encoderStatus & ACT_ENC_RANGE_ERR){
+  if(devStatus.encoder_status & ACT_ENC_RANGE_ERR){
     _log_message.write(LogMessage(Alarm, ACTSTR_ENC_RANGE_ERR,ACTALARM_ENC_RANGE_ERR));
   }
 #ifdef ACT_EXT_ENC

@@ -35,6 +35,8 @@ task_context "Task" do
         doc "set position"
     input_port('vel', 'int').
         doc "set velocity"
+    input_port('doublevel', 'double').
+        doc "set velocity"        
     periodic(0.2)
 end
 

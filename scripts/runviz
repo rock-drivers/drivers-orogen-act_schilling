@@ -55,11 +55,11 @@ Orocos.run 'act_schilling_test' do
 	end
 	
 	act.act_samples.connect_to do |data,_|
-           guiviz.edPos.setText data.shaftAng.to_s
+           guiviz.edPos.setText data.shaft_ang.to_s
         end
 	
 	act.act_samples.connect_to do |data,_|
-           guiviz.edVel.setText data.shaftVel.to_s
+           guiviz.edVel.setText data.shaft_vel.to_s
         end
 
 	guiviz.pbCalibrate.connect(SIGNAL('clicked()')) do 
