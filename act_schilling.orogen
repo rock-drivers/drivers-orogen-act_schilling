@@ -16,8 +16,8 @@ using_task_library "iodrivers_base"
 task_context "Task" do
     subclasses "iodrivers_base::Task"
     needs_configuration
-    runtime_states  :INIT_DEV, :CAL_DEV, :RUN_DEV
-    error_states :COMM_ERROR
+    runtime_states  :INIT_DEV, :CAL_DEV, :MONITORING
+    error_states :COMM_ERROR, :DEV_ERROR
     property('config','act_schilling/Config').
 	doc('configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles')
     property('boundaries','act_schilling/ActBoundaries').
@@ -31,7 +31,7 @@ task_context "Task" do
     output_port "act_status", "act_schilling/ActDeviceStatus"
     output_port('log_message', 'oro_marum/LogMessage').
         doc 'TextMessage with different priority levels'
-    input_port('pos', 'double').
+    input_port('pos', 'int').
         doc "set position"
     input_port('vel', 'int').
         doc "set velocity"

@@ -12,7 +12,7 @@ config:
 io_port: tcp://10.112.102.20:4001
 # the timeout on read. Defaults to one second
 io_read_timeout: 
-  microseconds: 2000000
+  microseconds: 4000000
 # the interval at which the status port should be written. Defaults to one second
 io_status_interval: 
   microseconds: 1000000

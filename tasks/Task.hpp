@@ -114,6 +114,10 @@ namespace act_schilling {
 	 void processIO();
 	 
 	 void statusCheck(const ActDeviceStatus& devStatus);
+	 
+	 void run();
+	 
+	 ActDeviceStatus devLogStatus;
     };
 }
 
