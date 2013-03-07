@@ -74,6 +74,9 @@ bool Task::startHook()
  void Task::errorHook()
  {
    LOG_DEBUG("errorHook");
+   if(DEV_ERROR == state()){
+     mDriver->clearError();
+   }
    run();
    TaskBase::errorHook();
  }
