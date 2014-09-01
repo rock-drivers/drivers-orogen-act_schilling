@@ -5,6 +5,8 @@ name "act_schilling"
 using_library "act_schilling"
 import_types_from "act_schilling/ActTypes.hpp"
 import_types_from "act_schilling/Config.hpp"
+import_types_from "act_schilling/PanTiltTypes.hpp"
+import_types_from "hrov_control/hrov_controlTypes.hpp"
 import_types_from "base_schilling/Error.hpp"
 
 using_task_library "iodrivers_base"
@@ -38,6 +40,51 @@ task_context "Task" do
     input_port('doublevel', 'double').
         doc "set velocity"        
     periodic(0.2)
+end
+
+task_context "PanTiltTask" do
+  subclasses "iodrivers_base::Task"
+  needs_configuration
+  runtime_states  :INIT_DEV, :CAL_DEV, :MONITORING
+  error_states :COMM_ERROR, :DEV_ERROR
+  property('config','act_schilling/Config').
+    doc('configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles')
+  property('boundaries','act_schilling/ActBoundaries').
+    doc('boundaries are the min/max values in angle, determined by the actuators mechanical assembly')
+  operation('calibrate').
+    doc('start calibration of the device')
+
+  output_port "act_samples", "act_schilling/ActData"
+  output_port "act_status", "act_schilling/ActDeviceStatus"
+  output_port "act_calibstatus", "bool"
+
+  output_port('log_message', 'oro_marum/LogMessage').
+      doc 'TextMessage with different priority levels'
+  input_port('pos', 'int').
+      doc "set position"    
+
+  property('joystickMap','act_schilling/JoyStickMapping').
+    doc('mapping values for the joystick')
+  property('defaultPositions','act_schilling/PanTiltDefaultPos').
+    doc('default Actuator Positions')
+    
+  
+  operation('setDefaultPos').
+      doc('set the default positions for the actuator').
+      argument('defPos', 'int')
+      
+  operation('setActualPosAsDefault').
+      doc('set the actual Position as new default position for the actuator').
+      argument('defPos', 'int')
+  
+  input_port('lock', 'bool').
+      doc "lock Aktuator"
+      
+  input_port('rawCommand', 'hrov_control/RawCommand').
+      doc 'Port for raw command structures comming from the joystick'
+
+  port_driven "rawCommand"
+  periodic(0.2)
 end
 
 

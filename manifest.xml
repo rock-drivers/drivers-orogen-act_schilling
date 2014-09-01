@@ -5,6 +5,7 @@
   <author>Sitta Buhmann/sbuhmann@marum.de</author>
   <license></license>
   <depend package="drivers/base_schilling" />
+  <depend package="drivers/orogen/hrov_control" />  
   <depend package="drivers/act_schilling" />
   <depend package="drivers/orogen/iodrivers_base" />
   <tags>underwater</tags>
