@@ -1,4 +1,4 @@
-/* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
+/* Generated from orogen/lib/orogen/templates/tasks/PanTiltTask.hpp */
 
 #ifndef ACT_SCHILLING_PANTILTTASK_TASK_HPP
 #define ACT_SCHILLING_PANTILTTASK_TASK_HPP
@@ -7,43 +7,46 @@
 
 namespace act_schilling {
     class Driver;
-    /*! \class Task
-   * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-   * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-   * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-   *
-   * \details
-   * The name of a TaskContext is primarily defined via:
-   \verbatim
-   deployment 'deployment_name'
-       task('custom_task_name','act_schilling::Task')
-   end
-   \endverbatim
-   *  It can be dynamically adapted when the deployment is called with a prefix argument.
-   */
+    /*! \class PanTiltTask
+     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
+     * 
+     * \details
+     * The name of a PanTiltTaskContext is primarily defined via:
+     \verbatim
+     deployment 'deployment_name'
+         task('custom_task_name','act_schilling::PanTiltTask')
+     end
+     \endverbatim
+     *  It can be dynamically adapted when the deployment is called with a prefix argument. 
+     */
     class PanTiltTask : public PanTiltTaskBase
     {
 	friend class PanTiltTaskBase;
     protected:
-	Driver* mDriver;
+      Driver* mDriver;
+
+
+
 
     public:
-        /** TaskContext constructor for Task
+        /** PanTiltTaskContext constructor for PanTiltTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param initial_state The initial PanTiltTaskState of the PanTiltTaskContext. Default is Stopped state.
          */
         PanTiltTask(std::string const& name = "act_schilling::PanTiltTask");
 
-        /** TaskContext constructor for Task 
+        /** PanTiltTaskContext constructor for PanTiltTask
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices. 
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task. 
          * 
          */
         PanTiltTask(std::string const& name, RTT::ExecutionEngine* engine);
 
-        /** Default deconstructor of Task
+        /** Default deconstructor of PanTiltTask
          */
-        ~PanTiltTask();
+	~PanTiltTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -53,7 +56,7 @@ namespace act_schilling {
          * It is meaningful only if the #needs_configuration has been specified
          * in the task context definition with (for example):
          \verbatim
-         task_context "TaskName" do
+         task_context "PanTiltTaskName" do
            needs_configuration
            ...
          end
@@ -104,35 +107,34 @@ namespace act_schilling {
          void cleanupHook();
 
 	 void calibrate();
+
 	 void setControlMode(act_schilling::ControlMode const & mode);
 
-         void setDefaultPos(int defPos);
-         void setActualPosAsDefault(int defPos);
+     void setDefaultPos(int defPos);
+
+     void setActualPosAsDefault(int defPos);
 
     private:
 	 void processIO();
-	 void statusCheck(const ActDeviceStatus& devStatus);
-	 void run();
-     void setRawCmd();
 
+	 void statusCheck(const ActDeviceStatus& devStatus);
+
+	 void run();
+
+     void setRawCmd();
 
 	 ActDeviceStatus devLogStatus;
 
-         act_schilling::JoyStickMapping mJoystickMap;
-         act_schilling::ControlMode mControlMode;
-         double mVelocity;
-         int mSetDefaultPos;
-         bool mSetDefaultFlag,mVelocityFlag;
-         std::vector<uint8_t> mDefaultValButtonsOld;
-         int  mDefaultValButtonSize;
-         bool mTriggerButtonFlag;
-         hrov_control::RawCommand mRawCmd;
-
-
-
-
+     act_schilling::JoyStickMapping mJoystickMap;
+     act_schilling::ControlMode mControlMode;
+     double mVelocity;
+     int mSetDefaultPos;
+     bool mSetDefaultFlag,mVelocityFlag;
+     std::vector<uint8_t> mDefaultValButtonsOld;
+     int  mDefaultValButtonSize;
+     bool mTriggerButtonFlag;
+     hrov_control::RawCommand mRawCmd;
     };
 }
 
 #endif
-

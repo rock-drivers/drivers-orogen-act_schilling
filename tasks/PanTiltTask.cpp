@@ -1,5 +1,4 @@
-/* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
-
+/* Generated from orogen/lib/orogen/templates/tasks/PanTiltTask.cpp */
 #include <base/logging.h>
 #include <rtt/extras/FileDescriptorActivity.hpp>
 #include <act_schilling/Driver.hpp>
@@ -28,13 +27,15 @@ PanTiltTask::~PanTiltTask()
   delete mDriver;
 }
 
+
+
 /// The following lines are template definitions for the various state machine
-// hooks defined by Orocos::RTT. See Task.hpp for more detailed
+// hooks defined by Orocos::RTT. See PanTiltTask.hpp for more detailed
 // documentation about them.
 
-bool PanTiltTask::configureHook()
+ bool PanTiltTask::configureHook()
  {
-    LOG_DEBUG("configureHook");
+    //LOG_DEBUG("configureHook");
     delete mDriver;
     act_schilling::Config configuration = _config.get();
     mDriver = new act_schilling::Driver(configuration);
@@ -44,26 +45,23 @@ bool PanTiltTask::configureHook()
     }
     setDriver(mDriver);
 
-    mJoystickMap = _joystickMap.get();
-    mDefaultValButtonSize = mJoystickMap.defaultValButtons.size();
-    mDefaultValButtonsOld = std::vector<uint8_t>(mDefaultValButtonSize,0);
-    mVelocity=0;
-    mSetDefaultPos =0;
-    mSetDefaultFlag = false;
-    mVelocityFlag = false;
-    mTriggerButtonFlag = false;
+    //    mJoystickMap = _joystickMap.get();
+    //    mDefaultValButtonSize = mJoystickMap.defaultValButtons.size();
+    //    mDefaultValButtonsOld = std::vector<uint8_t>(mDefaultValButtonSize,0);
+    //    mVelocity=0;
+    //    mSetDefaultPos =0;
+    //    mSetDefaultFlag = false;
+    //    mVelocityFlag = false;
+    //    mTriggerButtonFlag = false;
 
-    if (! TaskBase::configureHook())
+    if (! PanTiltTaskBase::configureHook())
       return false;
     return true;
-
-    LOG_DEBUG("configureHook_end");
-
 }
 
 bool PanTiltTask::startHook()
  {
-    LOG_DEBUG("startHook");
+    //LOG_DEBUG("startHook");
     RTT::extras::FileDescriptorActivity* fd_activity =
          getActivity<RTT::extras::FileDescriptorActivity>();
     if (fd_activity){
@@ -73,16 +71,14 @@ bool PanTiltTask::startHook()
     mDriver->setReadTimeout(_io_read_timeout.get());
     mDriver->setWriteTimeout(_io_write_timeout.get());
 
-    if (! TaskBase::startHook())
+    if (! PanTiltTaskBase::startHook())
       return false;
     return true;
 }
 
  void PanTiltTask::updateHook()
  {
-	LOG_DEBUG("PanTiltTask::updateHook()");
-    run();
-	LOG_DEBUG("PanTiltTask::updateHook()_end");
+   run();
  }
 
  void PanTiltTask::errorHook()
@@ -92,14 +88,12 @@ bool PanTiltTask::startHook()
      mDriver->clearError();
    }
    run();
-   TaskBase::errorHook();
+   PanTiltTaskBase::errorHook();
  }
 
  void PanTiltTask::stopHook()
  {
-   LOG_DEBUG("PanTiltTask::stopHook()");
-   TaskBase::stopHook();
-   LOG_DEBUG("PanTiltTask::stopHook()_end");
+   PanTiltTaskBase::stopHook();
  }
 
 void PanTiltTask::cleanupHook()
@@ -107,14 +101,24 @@ void PanTiltTask::cleanupHook()
     if(mDriver){
       mDriver->close();
     }
-    TaskBase::cleanupHook();
+    PanTiltTaskBase::cleanupHook();
 }
 
 void PanTiltTask::calibrate()
 {
   try{
     mDriver->calibrate();
-    _act_calibstatus.write(false);
+  } catch(std::runtime_error &e){
+    LOG_DEBUG("exception %s",e.what());
+    _log_message.write(LogMessage(e));
+    exception(IO_TIMEOUT);
+  }
+}
+
+void PanTiltTask::setControlMode(act_schilling::ControlMode  const & mode)
+{
+  try{
+    mDriver->setControlMode(mode);
   } catch(std::runtime_error &e){
     LOG_DEBUG("exception %s",e.what());
     _log_message.write(LogMessage(e));
@@ -124,7 +128,7 @@ void PanTiltTask::calibrate()
 
 void PanTiltTask::processIO()
 {
-  LOG_DEBUG("processIO");
+  //LOG_DEBUG("processIO");
   mDriver->read();
   if(mDriver->hasStatusUpdate()){
     ActData data = mDriver->getData();
@@ -198,101 +202,94 @@ void PanTiltTask::statusCheck(const ActDeviceStatus& devStatus)
   }
 }
 
- void PanTiltTask::setDefaultPos(int defPos){
-   act_schilling::PanTiltDefaultPos defaultPos = _defaultPositions.get();
-   mSetDefaultPos = defaultPos.pos_value[defPos];
-   mSetDefaultFlag = true;
- }
-
- void PanTiltTask::setActualPosAsDefault(int defPos){
-   act_schilling::ActData data = mDriver->getData();
-   act_schilling::PanTiltDefaultPos defaultPos = _defaultPositions.get();
-   defaultPos.pos_value[defPos] = (int)data.shaft_ang ;
-   _defaultPositions.set(defaultPos);
- }
 
 void PanTiltTask::run()
 {
 	//LOG_DEBUG("run");
 	try{
 		switch(state()){
-		case RUNNING: {
-			LOG_DEBUG("RUNNING");
-			_act_calibstatus.write(true);
-			mDriver->clearReadBuffer();
-			mDriver->initDevice();
-			state(INIT_DEV);
-			break;
-		}
-		case INIT_DEV:{
-			LOG_DEBUG("INITDEV");
-			if(mDriver->getState().initialized){
-				state(CAL_DEV);
+			case RUNNING: {
+				_act_calibstatus.write(true);
+				mDriver->clearReadBuffer();
+				mDriver->initDevice();
+				state(INIT_DEV);
+				break;
 			}
-			break;
-		}
-		case CAL_DEV:{
-			LOG_DEBUG("CALDEV");
-			if(mDriver->getState().calibrated){
-				_boundaries.set(mDriver->getBoundaries());
-				_act_calibstatus.write(false);
-				state(MONITORING);
+			case INIT_DEV:{
+				if(mDriver->getState().initialized){
+					_act_calibstatus.write(false);
+					state(CAL_DEV);
+				}
+				break;
 			}
-			break;
-		}
-		case MONITORING:{
-			int i;
-			bool lock;
+			case CAL_DEV:{
+				if(mDriver->getState().calibrated){
+					_act_calibstatus.write(true);
+					_boundaries.set(mDriver->getBoundaries());
+					state(MONITORING);
+				}
+				break;
+			}
+			case MONITORING:{
+				int i;
+				bool lock;
+				double d;
 
-			while (_rawCommand.read(mRawCmd) == RTT::NewData) {
-				setRawCmd();
-			}
+				while (_rawCommand.read(mRawCmd) == RTT::NewData) {
+					setRawCmd();
+				}
 
-			if(mControlMode != MODE_NONE){
-				if (mVelocityFlag) {
-					if(mControlMode == MODE_POS){
+				if(mControlMode != MODE_NONE){
+					if (mVelocityFlag) {
+						if(mControlMode == MODE_POS){
+							mControlMode = MODE_VEL;
+							mDriver->setControlMode(mControlMode);
+						}
+						mDriver->setVelocity(mVelocity*MAX_VEL);
+						mVelocityFlag = false;
+					}
+					if (_pos.read(i) == RTT::NewData) {
+						if(mControlMode == MODE_VEL){
+							mControlMode = MODE_POS;
+							mDriver->setControlMode(mControlMode);
+						}
+						LOG_DEBUG("input port pos changed");
+						mDriver->setAnglePos(i);
+					}
+					if (mSetDefaultFlag) {
+						if(mControlMode == MODE_VEL){
+							mControlMode = MODE_POS;
+							mDriver->setControlMode(mControlMode);
+						}
+						LOG_DEBUG("set default position");
+						mDriver->setAnglePos(mSetDefaultPos);
+						mSetDefaultFlag = false;
+					}
+				}
+				if (_lock.read(lock) == RTT::NewData) {
+					if(lock){
+						mControlMode = MODE_NONE;
+					} else {
 						mControlMode = MODE_VEL;
-						mDriver->setControlMode(mControlMode);
 					}
-					mDriver->setVelocity(mVelocity*MAX_VEL);
-					mVelocityFlag = false;
+					mDriver->setControlMode(mControlMode);
 				}
-				if (_pos.read(i) == RTT::NewData) {
-					if(mControlMode == MODE_VEL){
-						mControlMode = MODE_POS;
-						mDriver->setControlMode(mControlMode);
-					}
-					LOG_DEBUG("input port pos changed");
-					mDriver->setAnglePos(i);
-				}
-				if (mSetDefaultFlag) {
-					if(mControlMode == MODE_VEL){
-						mControlMode = MODE_POS;
-						mDriver->setControlMode(mControlMode);
-					}
-					LOG_DEBUG("set default position");
-					mDriver->setAnglePos(mSetDefaultPos);
-					mSetDefaultFlag = false;
-				}
+				break;
 			}
-			if (_lock.read(lock) == RTT::NewData) {
-				if(lock){
-					mControlMode = MODE_NONE;
-				} else {
-					mControlMode = MODE_VEL;
-				}
-				mDriver->setControlMode(mControlMode);
-			}
-			break;
+			default: break;
 		}
-		default: break;
-		}
+
 		mDriver->requestStatus();
-//		mDriver->writeNext();		//warum steht das hier??
+		LOG_DEBUG("call WRITENEXT");
+
+		mDriver->writeNext();
+		LOG_DEBUG("WRITENEXT");
+
 		while(!mDriver->isIdle()){
 			processIO();
 			mDriver->writeNext();
 		}
+
 	} catch(std::runtime_error &e){
 		LOG_DEBUG("exception %s",e.what());
 		_log_message.write(LogMessage(e));
@@ -300,42 +297,55 @@ void PanTiltTask::run()
 	}
 }
 
- void PanTiltTask::setRawCmd(){
-    bool trigger = mRawCmd.buttonValue[mJoystickMap.triggerButton];
+void PanTiltTask::setDefaultPos(int defPos){
+  act_schilling::PanTiltDefaultPos defaultPos = _defaultPositions.get();
+  mSetDefaultPos = defaultPos.pos_value[defPos];
+  mSetDefaultFlag = true;
+}
+
+void PanTiltTask::setActualPosAsDefault(int defPos){
+  act_schilling::ActData data = mDriver->getData();
+  act_schilling::PanTiltDefaultPos defaultPos = _defaultPositions.get();
+  defaultPos.pos_value[defPos] = (int)data.shaft_ang ;
+  _defaultPositions.set(defaultPos);
+}
+
+void PanTiltTask::setRawCmd(){
+   bool trigger = mRawCmd.buttonValue[mJoystickMap.triggerButton];
 
 
-    if(trigger){
-      //double max min +-2
-      int val = mRawCmd.axisValue[mJoystickMap.inputAxisNumber][mJoystickMap.inputAxisDimension];
-      double velocity = (double) val * 2 / 32767;
-      if(velocity != mVelocity){
-        mVelocity = velocity;
-        mVelocityFlag = true;
-      }
+   if(trigger){
+     //double max min +-2
+     int val = mRawCmd.axisValue[mJoystickMap.inputAxisNumber][mJoystickMap.inputAxisDimension];
+     double velocity = (double) val * 2 / 100;
+     if(velocity != mVelocity){
+       mVelocity = velocity;
+       mVelocityFlag = true;
+     }
 
-      for(int i; i < mDefaultValButtonSize; i++) {
- 	 uint8_t value = mRawCmd.buttonValue[mJoystickMap.defaultValButtons[i]];
+     for(int i; i < mDefaultValButtonSize; i++) {
+	 uint8_t value = mRawCmd.buttonValue[mJoystickMap.defaultValButtons[i]];
 
- 	 if(value != mDefaultValButtonsOld[i]){
- 	     if(value > 0){
- 		 setDefaultPos(i);
- 	     }
- 	     mDefaultValButtonsOld[i] = value;
- 	 }
-      }
+	 if(value != mDefaultValButtonsOld[i]){
+	     if(value > 0){
+		 setDefaultPos(i);
+	     }
+	     mDefaultValButtonsOld[i] = value;
+	 }
+     }
 
-      if(mJoystickMap.configureButton > 0)
-        if(mRawCmd.buttonValue[mJoystickMap.configureButton] > 0 && mDriver->getState().calibrated){
- 	   mDriver->setResetState();
- 	   state(RUNNING);
-        }
-      mTriggerButtonFlag = true;
-    }
+     if(mJoystickMap.configureButton > 0)
+       if(mRawCmd.buttonValue[mJoystickMap.configureButton] > 0 && mDriver->getState().calibrated){
+	   mDriver->setResetState();
+	   state(RUNNING);
+       }
+     mTriggerButtonFlag = true;
+   }
 
-    if(mTriggerButtonFlag){
-        mVelocity = 0;
-        mVelocityFlag = true;
+   if(mTriggerButtonFlag){
+       mVelocity = 0;
+       mVelocityFlag = true;
 
-        mTriggerButtonFlag = false;
-    }
-  }
+       mTriggerButtonFlag = false;
+   }
+ }

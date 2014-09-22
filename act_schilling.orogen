@@ -48,26 +48,29 @@ task_context "PanTiltTask" do
   runtime_states  :INIT_DEV, :CAL_DEV, :MONITORING
   error_states :COMM_ERROR, :DEV_ERROR
   property('config','act_schilling/Config').
-    doc('configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles')
+doc('configuration values for the actuator, standard velocity in position mode, default control mode and home position in angles')
   property('boundaries','act_schilling/ActBoundaries').
-    doc('boundaries are the min/max values in angle, determined by the actuators mechanical assembly')
+doc('boundaries are the min/max values in angle, determined by the actuators mechanical assembly')
   operation('calibrate').
-    doc('start calibration of the device')
-
+      doc('start calibration of the device')
+  operation('setControlMode').
+      doc('set the control mode to position, velocity or none').
+      argument('mode', 'act_schilling/ControlMode')
   output_port "act_samples", "act_schilling/ActData"
   output_port "act_status", "act_schilling/ActDeviceStatus"
-  output_port "act_calibstatus", "bool"
-
   output_port('log_message', 'oro_marum/LogMessage').
       doc 'TextMessage with different priority levels'
   input_port('pos', 'int').
-      doc "set position"    
-
+      doc "set position"
+  input_port('vel', 'int').
+      doc "set velocity"
+  input_port('doublevel', 'double').
+      doc "set velocity"
+  
   property('joystickMap','act_schilling/JoyStickMapping').
     doc('mapping values for the joystick')
   property('defaultPositions','act_schilling/PanTiltDefaultPos').
-    doc('default Actuator Positions')
-    
+    doc('default Actuator Positions')  
   
   operation('setDefaultPos').
       doc('set the default positions for the actuator').
@@ -79,11 +82,12 @@ task_context "PanTiltTask" do
   
   input_port('lock', 'bool').
       doc "lock Aktuator"
-      
   input_port('rawCommand', 'hrov_control/RawCommand').
       doc 'Port for raw command structures comming from the joystick'
-
   port_driven "rawCommand"
+  
+  output_port "act_calibstatus", "bool"
+  
   periodic(0.2)
 end
 
