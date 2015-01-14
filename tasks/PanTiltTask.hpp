@@ -121,7 +121,7 @@ namespace act_schilling {
 
 	 void run();
 
-     void setRawCmd();
+//   void setRawCmd();
 
 	 ActDeviceStatus devLogStatus;
 
@@ -133,7 +133,7 @@ namespace act_schilling {
      std::vector<uint8_t> mDefaultValButtonsOld;
      int  mDefaultValButtonSize;
      bool mTriggerButtonFlag;
-     hrov_control::RawCommand mRawCmd;
+//   hrov_control::RawCommand mRawCmd;
     };
 }
 

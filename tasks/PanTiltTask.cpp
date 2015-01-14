@@ -235,9 +235,9 @@ void PanTiltTask::run()
 				bool lock;
 				double d;
 
-				while (_rawCommand.read(mRawCmd) == RTT::NewData) {
-					setRawCmd();
-				}
+//				while (_rawCommand.read(mRawCmd) == RTT::NewData) {
+//					setRawCmd();
+//				}
 
 				if(mControlMode != MODE_NONE){
 					if (mVelocityFlag) {
@@ -310,42 +310,42 @@ void PanTiltTask::setActualPosAsDefault(int defPos){
   _defaultPositions.set(defaultPos);
 }
 
-void PanTiltTask::setRawCmd(){
-   bool trigger = mRawCmd.buttonValue[mJoystickMap.triggerButton];
-
-
-   if(trigger){
-     //double max min +-2
-     int val = mRawCmd.axisValue[mJoystickMap.inputAxisNumber][mJoystickMap.inputAxisDimension];
-     double velocity = (double) val * 2 / 100;
-     if(velocity != mVelocity){
-       mVelocity = velocity;
-       mVelocityFlag = true;
-     }
-
-     for(int i; i < mDefaultValButtonSize; i++) {
-	 uint8_t value = mRawCmd.buttonValue[mJoystickMap.defaultValButtons[i]];
-
-	 if(value != mDefaultValButtonsOld[i]){
-	     if(value > 0){
-		 setDefaultPos(i);
-	     }
-	     mDefaultValButtonsOld[i] = value;
-	 }
-     }
-
-     if(mJoystickMap.configureButton > 0)
-       if(mRawCmd.buttonValue[mJoystickMap.configureButton] > 0 && mDriver->getState().calibrated){
-	   mDriver->setResetState();
-	   state(RUNNING);
-       }
-     mTriggerButtonFlag = true;
-   }
-
-   if(mTriggerButtonFlag){
-       mVelocity = 0;
-       mVelocityFlag = true;
-
-       mTriggerButtonFlag = false;
-   }
- }
+//void PanTiltTask::setRawCmd(){
+//   bool trigger = mRawCmd.buttonValue[mJoystickMap.triggerButton];
+//
+//
+//   if(trigger){
+//     //double max min +-2
+//     int val = mRawCmd.axisValue[mJoystickMap.inputAxisNumber][mJoystickMap.inputAxisDimension];
+//     double velocity = (double) val * 2 / 100;
+//     if(velocity != mVelocity){
+//       mVelocity = velocity;
+//       mVelocityFlag = true;
+//     }
+//
+//     for(int i; i < mDefaultValButtonSize; i++) {
+//	 uint8_t value = mRawCmd.buttonValue[mJoystickMap.defaultValButtons[i]];
+//
+//	 if(value != mDefaultValButtonsOld[i]){
+//	     if(value > 0){
+//		 setDefaultPos(i);
+//	     }
+//	     mDefaultValButtonsOld[i] = value;
+//	 }
+//     }
+//
+//     if(mJoystickMap.configureButton > 0)
+//       if(mRawCmd.buttonValue[mJoystickMap.configureButton] > 0 && mDriver->getState().calibrated){
+//	   mDriver->setResetState();
+//	   state(RUNNING);
+//       }
+//     mTriggerButtonFlag = true;
+//   }
+//
+//   if(mTriggerButtonFlag){
+//       mVelocity = 0;
+//       mVelocityFlag = true;
+//
+//       mTriggerButtonFlag = false;
+//   }
+// }

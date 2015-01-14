@@ -244,6 +244,7 @@ void Task::run()
     } catch(std::runtime_error &e){
       LOG_DEBUG("exception %s",e.what());
       _log_message.write(LogMessage(e));
+      //recover();
       exception(IO_TIMEOUT);
     }
 }

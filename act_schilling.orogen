@@ -82,9 +82,9 @@ doc('boundaries are the min/max values in angle, determined by the actuators mec
   
   input_port('lock', 'bool').
       doc "lock Aktuator"
-  input_port('rawCommand', 'hrov_control/RawCommand').
-      doc 'Port for raw command structures comming from the joystick'
-  port_driven "rawCommand"
+#  input_port('rawCommand', 'hrov_control/RawCommand').
+#      doc 'Port for raw command structures comming from the joystick'
+#  port_driven "rawCommand"
   
   output_port "act_calibstatus", "bool"
   
