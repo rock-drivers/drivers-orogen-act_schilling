@@ -1,5 +1,5 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
-#include <base/logging.h>
+#include <base-logging/Logging.hpp>
 #include <rtt/extras/FileDescriptorActivity.hpp>
 #include <act_schilling/Driver.hpp>
 #include <base_schilling/Error.hpp>
